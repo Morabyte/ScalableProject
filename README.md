@@ -1,6 +1,6 @@
-### Co-Purchase Analysis con Apache Spark
+# Co-Purchase Analysis con Apache Spark
 
-# Descrizione del Progetto
+## Descrizione del Progetto
 
 Questo progetto implementa un'analisi di co-acquisto utilizzando Apache Spark, valutando la frequenza con cui due prodotti vengono acquistati insieme nello stesso ordine. L'obiettivo principale è confrontare due implementazioni:
 
@@ -10,7 +10,7 @@ Versione Ottimizzata con RDD: utilizza reduceByKey() per un'elaborazione più ef
 
 L'analisi viene eseguita in un ambiente distribuito, testato su Google Cloud Platform (GCP) con Dataproc.
 
-# Dataset
+## Dataset
 
 Il dataset è un file CSV in cui ogni riga rappresenta un acquisto:
 
@@ -23,29 +23,27 @@ ordine_id,prodotto_id
 
 Il programma calcola le coppie di prodotti che appaiono negli stessi ordini e il numero di volte in cui ciò accade.
 
-# Confronto tra Versioni
+## Confronto tra Versioni
 
-Metrica | Versione Inefficiente | Versione Ottimizzata (RDD)
+Metrica                     | Versione Inefficiente                     | Versione Ottimizzata (RDD)
+--------------------------- | ----------------------------------------- | -----------------------------------------------------
 
-Tempo di esecuzione | Alto (molta latenza) | Inferiore (ridotta latenza)
+Tempo di esecuzione         | Alto (molta latenza)                      | Inferiore (ridotta latenza)
 
-Utilizzo della memoria | Alto (groupByKey() genera grandi liste) | Ottimizzato (reduceByKey() limita lo shuffle)
+Utilizzo della memoria      | Alto (groupByKey() genera grandi liste)   | Ottimizzato (reduceByKey() limita lo shuffle)
 
-Efficienza dello shuffle | Elevato overhead | Minimo (uso ottimizzato di RDD)
+Efficienza dello shuffle    | Elevato overhead                          | Minimo (uso ottimizzato di RDD)
 
-Scalabilità | Scarsa (rallenta con dataset grandi) | Ottima (distribuisce il carico in modo efficiente)
+Scalabilità                 | Scarsa (rallenta con dataset grandi)      | Ottima (distribuisce il carico in modo efficiente)
 
-# Requisiti
+## Requisiti
 
-Apache Spark
+- Apache Spark
+- Scala
+- Java (JDK 8 o superiore)
+- Google Cloud SDK (per esecuzione su GCP)
 
-Scala
-
-Java (JDK 8 o superiore)
-
-Google Cloud SDK (per esecuzione su GCP)
-
-# Esecuzione Locale
+## Esecuzione Locale
 
 ```
 # Compilare il progetto
@@ -63,9 +61,9 @@ spark-submit --class CoPurchaseAnalysisRDD \
     target/scala-2.12/co-purchase-analysis.jar \
     input.csv output_rdd/
 ```
-# Esecuzione su GCP Dataproc
+## Esecuzione su GCP Dataproc
 
-Creare un cluster Dataproc:
+1. Creare un cluster Dataproc:
 ```
 gcloud dataproc clusters create my-cluster \
     --region europe-west1 \
@@ -73,12 +71,12 @@ gcloud dataproc clusters create my-cluster \
     --image-version 2.0-debian10 \
     --scopes cloud-platform
 ```
-Caricare i file su Google Cloud Storage (GCS):
+2. Caricare i file su Google Cloud Storage (GCS):
 ```
 gsutil cp input.csv gs://my-bucket/input.csv
 gsutil cp target/scala-2.12/co-purchase-analysis.jar gs://my-bucket/
 ```
-Eseguire il job su Dataproc:
+3. Eseguire il job su Dataproc:
 ```
 gcloud dataproc jobs submit spark \
     --cluster my-cluster \
@@ -87,16 +85,16 @@ gcloud dataproc jobs submit spark \
     -- gs://my-bucket/input.csv gs://my-bucket/output_rdd/
 ```
 
-# Output
+## Output
 
 L'output viene salvato in formato CSV con righe del tipo:
-
+```
 prodotto_1,prodotto_2,frequenza
 8,12,2
 12,14,3
 ...
-
-# Benchmark
+```
+## Benchmark
 
 Per valutare le prestazioni:
 ```
