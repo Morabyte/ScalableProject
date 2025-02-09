@@ -13,14 +13,14 @@ L'analisi viene eseguita in un ambiente distribuito, testato su Google Cloud Pla
 ## Dataset
 
 Il dataset è un file CSV in cui ogni riga rappresenta un acquisto:
-
+```
 ordine_id,prodotto_id
 1,12
 1,14
 2,8
 2,12
 ...
-
+```
 Il programma calcola le coppie di prodotti che appaiono negli stessi ordini e il numero di volte in cui ciò accade.
 
 ## Confronto tra Versioni
@@ -28,13 +28,9 @@ Il programma calcola le coppie di prodotti che appaiono negli stessi ordini e il
 Metrica                     | Versione Inefficiente                     | Versione Ottimizzata (RDD)
 --------------------------- | ----------------------------------------- | -----------------------------------------------------
 Tempo di esecuzione         | Alto (molta latenza)                      | Inferiore (ridotta latenza)
---------------------------- | ----------------------------------------- | -----------------------------------------------------
 Utilizzo della memoria      | Alto (groupByKey() genera grandi liste)   | Ottimizzato (reduceByKey() limita lo shuffle)
---------------------------- | ----------------------------------------- | -----------------------------------------------------
 Efficienza dello shuffle    | Elevato overhead                          | Minimo (uso ottimizzato di RDD)
---------------------------- | ----------------------------------------- | -----------------------------------------------------
 Scalabilità                 | Scarsa (rallenta con dataset grandi)      | Ottima (distribuisce il carico in modo efficiente)
---------------------------- | ----------------------------------------- | -----------------------------------------------------
 
 ## Requisiti
 
