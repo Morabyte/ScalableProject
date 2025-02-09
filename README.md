@@ -27,14 +27,14 @@ Il programma calcola le coppie di prodotti che appaiono negli stessi ordini e il
 
 Metrica                     | Versione Inefficiente                     | Versione Ottimizzata (RDD)
 --------------------------- | ----------------------------------------- | -----------------------------------------------------
-
 Tempo di esecuzione         | Alto (molta latenza)                      | Inferiore (ridotta latenza)
-
+--------------------------- | ----------------------------------------- | -----------------------------------------------------
 Utilizzo della memoria      | Alto (groupByKey() genera grandi liste)   | Ottimizzato (reduceByKey() limita lo shuffle)
-
+--------------------------- | ----------------------------------------- | -----------------------------------------------------
 Efficienza dello shuffle    | Elevato overhead                          | Minimo (uso ottimizzato di RDD)
-
+--------------------------- | ----------------------------------------- | -----------------------------------------------------
 Scalabilità                 | Scarsa (rallenta con dataset grandi)      | Ottima (distribuisce il carico in modo efficiente)
+--------------------------- | ----------------------------------------- | -----------------------------------------------------
 
 ## Requisiti
 
