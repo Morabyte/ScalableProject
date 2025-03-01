@@ -18,7 +18,12 @@ libraryDependencies ++= Seq(
   "org.apache.spark" %% "spark-core" % "3.5.3",
   "org.apache.spark" %% "spark-sql" % "3.5.2",
 
-  "com.github.mrpowers" %% "spark-daria" % "1.2.3", //lib utils to write csv
+  //lib utils to write csv
+  "com.github.mrpowers" %% "spark-daria" % "1.2.3",
+
+  //lib to read from gcp bucket (i.e. read input csv file)
+  "com.google.cloud.bigdataoss" % "gcs-connector" % "hadoop3-2.2.7" % "provided"
 )
+libraryDependencies += "com.google.cloud.bigdataoss" % "gcs-connector" % "hadoop3-2.2.7" % "provided"
 
 //  sbt -J--add-exports=java.base/sun.nio.ch=ALL-UNNAMED run

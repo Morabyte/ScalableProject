@@ -19,8 +19,8 @@ object CoPurchaseAnalysis extends Serializable {
     println("\tStart Analysis: ")
     startTimeMillis = System.currentTimeMillis()
 
-    // Leggere il dataset CSV
-    val inputPath = args(0).replace("file:/", "")
+    // passo link del mio bucket -> Leggere il dataset CSV
+    val inputPath = args(0) //+ "/resources/in/order_products.csv"
 
     //Lettura del dataset come RDD
     val dataSet: RDD[(Int, Int)] = sc.textFile(inputPath)
@@ -63,7 +63,7 @@ object CoPurchaseAnalysis extends Serializable {
     ))
     
     Utily.writeToCSV(
-      "./resources/out/",
+      inputPath.split("/").dropRight(2).mkString("/") + "/out/",
       "coPurchaseAnalysis.csv",
       spark.sqlContext.createDataFrame( 
         coPurchaseCounts.sortBy({ case ((_, _), count) => count }, ascending = false)
