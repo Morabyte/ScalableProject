@@ -23,15 +23,6 @@ ordine_id,prodotto_id
 ```
 Il programma calcola le coppie di prodotti che appaiono negli stessi ordini e il numero di volte in cui ciò accade.
 
-## Confronto tra Versioni
-
-Metrica                     | Versione Inefficiente                     | Versione Ottimizzata (RDD)
---------------------------- | ----------------------------------------- | -----------------------------------------------------
-Tempo di esecuzione         | Alto (molta latenza)                      | Inferiore (ridotta latenza)
-Utilizzo della memoria      | Alto (groupByKey() genera grandi liste)   | Ottimizzato (reduceByKey() limita lo shuffle)
-Efficienza dello shuffle    | Elevato overhead                          | Minimo (uso ottimizzato di RDD)
-Scalabilità                 | Scarsa (rallenta con dataset grandi)      | Ottima (distribuisce il carico in modo efficiente)
-
 ## Requisiti
 
 - Apache Spark
@@ -39,23 +30,36 @@ Scalabilità                 | Scarsa (rallenta con dataset grandi)      | Ottim
 - Java (JDK 8 o superiore)
 - Google Cloud SDK (per esecuzione su GCP)
 
-## Esecuzione Locale
+## Esecuzione 
+
+### Eseguire in locale il progetto
+Per eseguire il progetto in locale basta eseguire il comando:
+```
+sbt run
+```
+
+Nel caso venisse mostrato un errore java.lang.IllegalAccessError sulla classe sun.nio.ch.DirectBuffer eseguire il comando:
+```
+sbt -J--add-exports=java.base/sun.nio.ch=ALL-UNNAMED run
+```
+
+o in alternativa:
+```
+export SBT_OPTS="--add-opens=java.base/sun.nio.ch=ALL-UNNAMED"
+sbt run
+```
+Queto errore è dovuto al fatto che la classe menzionata non è esportata dal modulo java.base. 
+Questo problema è comune con versioni di Java 9+ a causa delle restrizioni sui moduli.
+
+### Compilare il progetto
 
 ```
-# Compilare il progetto
 sbt package
 
-# Eseguire la versione inefficiente
-spark-submit --class CoPurchaseAnalysisSlow \
+spark-submit --class CoPurchaseAnalysis \
     --master local[4] \
-    target/scala-2.12/co-purchase-analysis.jar \
-    input.csv output_slow/
+    target/scala-2.12/co-purchase-analysis.jar 
 
-# Eseguire la versione ottimizzata con RDD
-spark-submit --class CoPurchaseAnalysisRDD \
-    --master local[4] \
-    target/scala-2.12/co-purchase-analysis.jar \
-    input.csv output_rdd/
 ```
 ## Esecuzione su GCP Dataproc
 
@@ -86,21 +90,18 @@ gcloud dataproc jobs submit spark \
 L'output viene salvato in formato CSV con righe del tipo:
 ```
 prodotto_1,prodotto_2,frequenza
-8,12,2
-12,14,3
+13176,47209,62341
+13176,21137,61628
 ...
-```
-## Benchmark
-
-Per valutare le prestazioni:
-```
-# Contare le righe di output
-tail -n +1 output_rdd/* | wc -l
-
-# Controllare i tempi di esecuzione nei log di Spark
 ```
 
 # Conclusioni
+## Confronto tra Cluster
 
-La versione ottimizzata con RDD migliora significativamente il tempo di esecuzione e l'uso della memoria, rendendola adatta a dataset di grandi dimensioni su cluster distribuiti.
-
+Metrica                     | Macchina locale                           | Cluster medio                                         | Cluster potente
+--------------------------- | ----------------------------------------- | ----------------------------------------------------- |-------------------------
+Tempo di esecuzione         | Alto (molta latenza)                      | Inferiore (ridotta latenza)                           |
+Utilizzo della memoria      | Alto (groupByKey() genera grandi liste)   | Ottimizzato (reduceByKey() limita lo shuffle)         |
+Efficienza dello shuffle    | Elevato overhead                          | Minimo (uso ottimizzato di RDD)                       |
+Tempo di GarbageCollection  | Scarsa (rallenta con dataset grandi)      | Ottima (distribuisce il carico in modo efficiente)    |
+Scalabilità                 | Scarsa (rallenta con dataset grandi)      | Ottima (distribuisce il carico in modo efficiente)    |

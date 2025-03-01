@@ -6,7 +6,13 @@ lazy val root = (project in file("."))
     name := "CoPurchaseAnalysis"
   )
 
-mainClass in Compile := Some("copurchase.analysis.Main")
+Compile / mainClass := Some("copurchase.analysis.Main")
+
+//to avoid: java.lang.IllegalAccessError: class org.apache.spark.storage.StorageUtils$ (in unnamed module @0x44629c20) cannot access class sun.nio.ch.DirectBuffer (in module java.base) because module java.base does not export sun.nio.ch to unnamed module @0x44629c20
+//la classe sun.nio.ch.DirectBuffer, che non è esportata dal modulo java.base. Questo problema è comune con Java 16+ a causa delle restrizioni sui moduli.
+ThisBuild / fork := true
+ThisBuild / javaOptions += "--add-exports=java.base/sun.nio.ch=ALL-UNNAMED"
+ThisBuild / classLoaderLayeringStrategy := ClassLoaderLayeringStrategy.Flat
 
 libraryDependencies ++= Seq(
   "org.apache.spark" %% "spark-core" % "3.5.3",
@@ -15,9 +21,4 @@ libraryDependencies ++= Seq(
   "com.github.mrpowers" %% "spark-daria" % "1.2.3", //lib utils to write csv
 )
 
-//to avoid: java.lang.IllegalAccessError: class org.apache.spark.storage.StorageUtils$ (in unnamed module @0x44629c20) cannot access class sun.nio.ch.DirectBuffer (in module java.base) because module java.base does not export sun.nio.ch to unnamed module @0x44629c20
-//la classe sun.nio.ch.DirectBuffer, che non è esportata dal modulo java.base. Questo problema è comune con Java 16+ a causa delle restrizioni sui moduli.
-javaOptions ++= Seq(
-  "--add-opens", "java.base/sun.nio.ch=ALL-UNNAMED"
-)
 //  sbt -J--add-exports=java.base/sun.nio.ch=ALL-UNNAMED run

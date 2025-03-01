@@ -20,7 +20,6 @@ object CoPurchaseAnalysis extends Serializable {
     startTimeMillis = System.currentTimeMillis()
 
     // Leggere il dataset CSV
-    //val dataSet = args(0).persist() // Mantiene in memoria per evitare riletture
     val inputPath = args(0).replace("file:/", "")
 
     //Lettura del dataset come RDD
@@ -62,16 +61,18 @@ object CoPurchaseAnalysis extends Serializable {
       StructField("product2", IntegerType, nullable = false),
       StructField("count", IntegerType, nullable = false)
     ))
-    //val orderedDF = spark.sqlContext.createDataFrame( coPurchaseCounts.map { case ((product1, product2), count) => Row(product1, product2, count) } , schema ).orderBy(col("count").desc)
     
     Utily.writeToCSV(
       "./resources/out/",
       "coPurchaseAnalysis.csv",
-      spark.sqlContext.createDataFrame( coPurchaseCounts.map { case ((product1, product2), count) => Row(product1, product2, count) } , schema )
+      spark.sqlContext.createDataFrame( 
+        coPurchaseCounts.sortBy({ case ((_, _), count) => count }, ascending = false)
+          .map { case ((product1, product2), count) => Row(product1, product2, count) } 
+        , schema 
+      )
     )
 
     durationSeconds = (System.currentTimeMillis() - startTimeMillis) / 1000
     println("\t\tThe programs time to be executed: " + (durationSeconds / 3600) + " hours " + ((durationSeconds / 60) % 60) + " minutes " + (durationSeconds % 60) + " seconds")
-
   }
 }
