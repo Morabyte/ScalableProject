@@ -14,7 +14,7 @@ object Main extends Serializable {
 
   def main(args: Array[String]): Unit = {
     // Misura il tempo di esecuzione della versione ottimizzata
-    CoPurchaseAnalysisOptimized.startAnalysis(Array("./resources/in/order_products.csv"))
+    CoPurchaseAnalysis.startAnalysis(Array("./resources/in/order_products.csv"))
 
     spark.stop()
     println("Finish")

@@ -8,16 +8,16 @@ import org.apache.spark.sql.functions.col
 import org.apache.spark.sql.types.{IntegerType, StructField, StructType}
 
 
-object CoPurchaseAnalysisOptimized extends Serializable {
+object CoPurchaseAnalysis extends Serializable {
   def startAnalysis(args: Array[String]): Unit = {
     import spark.implicits._
 
     val sc = spark.sparkContext
-    var startTimeMillisOptimized: BigInt = 0
-    var durationSecondsOptimized: BigInt = 0
+    var startTimeMillis: BigInt = 0
+    var durationSeconds: BigInt = 0
 
-    println("\tStart optimized Analysis: ")
-    startTimeMillisOptimized = System.currentTimeMillis()
+    println("\tStart Analysis: ")
+    startTimeMillis = System.currentTimeMillis()
 
     // Leggere il dataset CSV
     //val dataSet = args(0).persist() // Mantiene in memoria per evitare riletture
@@ -66,12 +66,12 @@ object CoPurchaseAnalysisOptimized extends Serializable {
     
     Utily.writeToCSV(
       "./resources/out/",
-      "coPurchaseAnalysisOptimized.csv",
+      "coPurchaseAnalysis.csv",
       spark.sqlContext.createDataFrame( coPurchaseCounts.map { case ((product1, product2), count) => Row(product1, product2, count) } , schema )
     )
 
-    durationSecondsOptimized = (System.currentTimeMillis() - startTimeMillisOptimized) / 1000
-    println("\t\tThe programs time to be executed: " + (durationSecondsOptimized / 3600) + " hours " + ((durationSecondsOptimized / 60) % 60) + " minutes " + (durationSecondsOptimized % 60) + " seconds")
+    durationSeconds = (System.currentTimeMillis() - startTimeMillis) / 1000
+    println("\t\tThe programs time to be executed: " + (durationSeconds / 3600) + " hours " + ((durationSeconds / 60) % 60) + " minutes " + (durationSeconds % 60) + " seconds")
 
   }
 }
