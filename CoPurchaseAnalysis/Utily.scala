@@ -7,8 +7,9 @@ import org.apache.spark.sql.{DataFrame, Row}
 
 object Utily extends Serializable {
   def writeToCSV(path: String, filename: String, data: DataFrame): Unit = {
-    //data.coalesce(1).write.option("header", true).format("csv").mode("overwrite").save(path)
-    DariaWriters.writeSingleFile(
+    data.write.option("header", true).csv(path + filename)
+    //data.coalesce(1).write.option("header", true).format("csv").mode("overwrite").save(path + filename)
+    /*DariaWriters.writeSingleFile(
       df = data,
       format = "csv",
       sc = spark.sparkContext,
@@ -21,7 +22,7 @@ object Utily extends Serializable {
     fs.rename(new Path(path + "tmp/" + filename), new Path(path + filename))
 
     fs delete new Path(path + "tmp/")
-    fs delete new Path(path + "." + filename + ".crc")
+    fs delete new Path(path + "." + filename + ".crc")*/
   }
 
   def bytesToReadable(bytes: Long): String = {

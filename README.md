@@ -2,15 +2,18 @@
 
 ## Descrizione del Progetto
 
-Questo progetto implementa un'analisi di co-acquisto utilizzando Apache Spark, valutando la frequenza con cui due prodotti vengono acquistati insieme nello stesso ordine. L'obiettivo principale è confrontare due implementazioni:
+Questo progetto implementa un'analisi di co-acquisto utilizzando Scala ed Apache Spark, valutando la frequenza con cui due prodotti vengono acquistati insieme nello stesso ordine. 
 
-Versione Inefficiente: utilizza groupByKey(), causando un alto consumo di memoria e problemi di scalabilità.
+L'obiettivo principale è confrontare le performace in un ambiente distributo sfruttando la comupatazione cloud, quindi viene testato su Google Cloud Platform (GCP) con Dataproc.
 
-Versione Ottimizzata con RDD: utilizza reduceByKey() per un'elaborazione più efficiente.
+## Requisiti
 
-L'analisi viene eseguita in un ambiente distribuito, testato su Google Cloud Platform (GCP) con Dataproc.
+- Apache Spark
+- Scala
+- Java (JDK 8 o superiore)
+- Google Cloud SDK (per esecuzione su GCP)
 
-## Dataset
+## Dataset Input
 
 Il dataset è un file CSV in cui ogni riga rappresenta un acquisto:
 ```
@@ -23,19 +26,13 @@ ordine_id,prodotto_id
 ```
 Il programma calcola le coppie di prodotti che appaiono negli stessi ordini e il numero di volte in cui ciò accade.
 
-## Requisiti
-
-- Apache Spark
-- Scala
-- Java (JDK 8 o superiore)
-- Google Cloud SDK (per esecuzione su GCP)
-
 ## Esecuzione 
+i.e. I seguenti comandi sono da lanciare dall'interno dela cartella 'CoPurchaseAnalysis'
 
 ### Eseguire in locale il progetto
 Per eseguire il progetto in locale basta eseguire il comando:
 ```
-sbt run
+sbt "run <path/file/caricare>"
 ```
 
 Nel caso venisse mostrato un errore java.lang.IllegalAccessError sulla classe sun.nio.ch.DirectBuffer eseguire il comando:
@@ -43,49 +40,53 @@ Nel caso venisse mostrato un errore java.lang.IllegalAccessError sulla classe su
 sbt -J--add-exports=java.base/sun.nio.ch=ALL-UNNAMED run
 ```
 
-o in alternativa:
-```
-export SBT_OPTS="--add-opens=java.base/sun.nio.ch=ALL-UNNAMED"
-sbt run
-```
 Queto errore è dovuto al fatto che la classe menzionata non è esportata dal modulo java.base. 
 Questo problema è comune con versioni di Java 9+ a causa delle restrizioni sui moduli.
 
-### Compilare il progetto
+### Eseguire su cluster GCP Dataproc il progetto
 
+1. Compilare il progetto con il comando:
 ```
 sbt package
-
-spark-submit --class CoPurchaseAnalysis \
-    --master local[4] \
-    target/scala-2.12/co-purchase-analysis.jar 
-
 ```
-## Esecuzione su GCP Dataproc
 
-1. Creare un cluster Dataproc:
-```
-gcloud dataproc clusters create my-cluster \
-    --region europe-west1 \
-    --num-workers 3 \
-    --image-version 2.0-debian10 \
-    --scopes cloud-platform
-```
 2. Caricare i file su Google Cloud Storage (GCS):
 ```
-gsutil cp input.csv gs://my-bucket/input.csv
-gsutil cp target/scala-2.12/co-purchase-analysis.jar gs://my-bucket/
-```
-3. Eseguire il job su Dataproc:
-```
-gcloud dataproc jobs submit spark \
-    --cluster my-cluster \
-    --class CoPurchaseAnalysisRDD \
-    --jars gs://my-bucket/co-purchase-analysis.jar \
-    -- gs://my-bucket/input.csv gs://my-bucket/output_rdd/
+gsutil cp order_products.csv gs://<my-bucket>/jars
+gsutil cp target/scala-2.12/co-purchase-analysis.jar gs://<my-bucket>/
 ```
 
-## Output
+3. Creare un cluster Dataproc:
+```
+gcloud dataproc clusters create <my-cluster> \
+    --region=<region> \
+    --master-machine-type=<machine-type> \
+    --num-workers=<num-worker> \
+    --image-version=2.0-debian10 \
+    --project=<project-id>
+```
+
+4. Eseguire il job su Dataproc:
+```
+gcloud dataproc jobs submit spark \
+    --project=<project-id> \
+    --cluster=<my-cluster> \
+    --region=<region> \
+    --class=copurchase.analysis.Main \
+    --jars=gs://<my-bucket>/jars/copurchaseanalysis_2.12-0.1.jar  \
+    -- gs://<my-bucket>/in/order_products.csv
+```
+
+5. Spegnere il cluster 
+```
+gcloud dataproc clusters delete <my-cluster> --region=<region> --project=<project-id>
+```
+
+#### Note: 
+- le parole contrassenate da '<>' (es. <project-id>) sono da personalizzare con i propri dati del cluster
+- il parametro --project=<project-id> viene inserito solamente se il progetto predefinito nelle configurazioni locali è diverso da quello in cui si sta lavorando, altrimenti non è necessario 
+
+## Dataset Output
 
 L'output viene salvato in formato CSV con righe del tipo:
 ```
@@ -96,6 +97,7 @@ prodotto_1,prodotto_2,frequenza
 ```
 
 # Conclusioni
+
 ## Confronto tra Cluster
 
 Metrica                     | Macchina locale                           | Cluster medio                                         | Cluster potente
