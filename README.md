@@ -76,6 +76,7 @@ gcloud dataproc jobs submit spark \
     --jars=gs://<my-bucket>/jars/copurchaseanalysis_2.12-0.1.jar  \
     -- gs://<my-bucket>/in/order_products.csv
 ```
+L'ultimo argomento corrisponde al path che si assume sia su un bucket GCP
 
 5. Spegnere il cluster 
 ```
@@ -83,8 +84,8 @@ gcloud dataproc clusters delete <my-cluster> --region=<region> --project=<projec
 ```
 
 #### Note: 
-- le parole contrassenate da '<>' (es. <project-id>) sono da personalizzare con i propri dati del cluster
-- il parametro --project=<project-id> viene inserito solamente se il progetto predefinito nelle configurazioni locali è diverso da quello in cui si sta lavorando, altrimenti non è necessario 
+- le parole contrassenate da '<>' (es. ```<project-id>```) sono da personalizzare con i propri dati del cluster
+- il parametro --project=```<project-id>``` viene inserito solamente se il progetto predefinito nelle configurazioni locali è diverso da quello in cui si sta lavorando, altrimenti non è necessario 
 
 ## Dataset Output
 

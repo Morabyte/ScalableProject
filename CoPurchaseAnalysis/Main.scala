@@ -2,7 +2,6 @@ package copurchase.analysis
 
 import java.time.Instant
 import java.time.Duration
-import spark.implicits._
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.Row
 import copurchase.analysis.Utily._
@@ -18,14 +17,16 @@ object Main extends Serializable {
   spark.sparkContext.setLogLevel("ERROR")
   val sc = spark.sparkContext
 
-  spark.conf.set("spark.hadoop.fs.gs.impl", "com.google.cloud.hadoop.fs.gcs.GoogleHadoopFileSystem")
   spark.conf.set("spark.hadoop.google.cloud.auth.service.account.enable", "true")
+  spark.conf.set("spark.hadoop.fs.gs.impl", "com.google.cloud.hadoop.fs.gcs.GoogleHadoopFileSystem")
   //spark.conf.set("spark.hadoop.fs.gs.auth.service.account.json.keyfile", "<path>/serviceAccountkey.json") // -> to uncomment in local execution
+  spark.conf.set("fs.gs.auth.service.account.enable", "true")
   spark.conf.set("fs.gs.impl", "com.google.cloud.hadoop.fs.gcs.GoogleHadoopFileSystem")
   spark.conf.set("fs.AbstractFileSystem.gs.impl", "com.google.cloud.hadoop.fs.gcs.GoogleHadoopFS")
-  spark.conf.set("fs.gs.auth.service.account.enable", "true")
   
   def main(args: Array[String]): Unit = {
+    import spark.implicits._
+
     var startTimeMillis: BigInt = 0
     var durationSeconds: BigInt = 0
 
@@ -40,8 +41,6 @@ object Main extends Serializable {
         (cols(0).toInt, cols(1).toInt)
       })
       .persist() 
-    
-    println("\n\n\t\tRecord count: " + dataSet.count())
 
     val productPairs: RDD[((Int, Int), Int)] = dataSet
       .map { case (orderId, productId) => (orderId, List(productId)) }
@@ -72,9 +71,10 @@ object Main extends Serializable {
       )
     )
 
+    println("\t\tRecord count: " + dataSet.count())
     Utily.getSystemMetrics()
     durationSeconds = (System.currentTimeMillis() - startTimeMillis) / 1000
-    println("\n\n\t\tThe programs time to be executed: " + (durationSeconds / 3600) + " hours " + ((durationSeconds / 60) % 60) + " minutes " + (durationSeconds % 60) + " seconds")
+    println("\t\tThe programs time to be executed: " + (durationSeconds / 3600) + " hours " + ((durationSeconds / 60) % 60) + " minutes " + (durationSeconds % 60) + " seconds")
 
     spark.stop()
     println("Finish")

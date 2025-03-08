@@ -9,17 +9,17 @@ import org.apache.hadoop.fs.{FileSystem, Path}
 
 object Utily extends Serializable {
   def writeToCSV(path: String, filename: String, data: DataFrame): Unit = {
-    val fs = FileSystem.get(sc.hadoopConfiguration)
 
     data.repartition(1).write.option("header", true).mode("overwrite").csv(path)
     
+    /*val fs = FileSystem.get(sc.hadoopConfiguration)
     fs.listStatus(new Path(path)).foreach { fileStatus =>
       if (fileStatus.getPath.getName.endsWith(".crc") || fileStatus.getPath.getName == "_SUCCESS") {
         fs.delete(fileStatus.getPath, false)
       } else if (fileStatus.getPath.getName.endsWith(".csv")) {
         fs.rename(fileStatus.getPath, new Path(path + filename))
       }
-    }
+    }*/
   }
 
   def bytesToReadable(bytes: Long): String = {
@@ -43,6 +43,6 @@ object Utily extends Serializable {
     println("\t\tAvailable Processors: " + availableProcessors)
     println("\t\tShuffle Size: " + Utily.bytesToReadable(shuffleSize) + " bytes")
     println("\t\tUptime: " + (uptimeSeconds / 3600) + " hours " + ((uptimeSeconds / 60) % 60) + " minutes " + (uptimeSeconds % 60) + " seconds")
-    println("\t\tGarbage Collection: " + (gcTime / 3600) + " hours " + ((gcTime / 60) % 60) + " minutes " + (gcTime % 60) + " seconds")
+    println("\t\tGarbage Collector: " + (gcTime / 3600) + " hours " + ((gcTime / 60) % 60) + " minutes " + (gcTime % 60) + " seconds")
   }
 }
