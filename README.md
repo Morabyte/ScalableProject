@@ -96,15 +96,3 @@ prodotto_1,prodotto_2,frequenza
 13176,21137,61628
 ...
 ```
-
-# Conclusioni
-
-## Confronto tra Cluster
-
-Metrica                     | Macchina locale                           | Cluster medio                                         | Cluster potente
---------------------------- | ----------------------------------------- | ----------------------------------------------------- |-------------------------
-Tempo di esecuzione         | Alto (molta latenza)                      | Inferiore (ridotta latenza)                           |
-Utilizzo della memoria      | Alto (groupByKey() genera grandi liste)   | Ottimizzato (reduceByKey() limita lo shuffle)         |
-Efficienza dello shuffle    | Elevato overhead                          | Minimo (uso ottimizzato di RDD)                       |
-Tempo di GarbageCollection  | Scarsa (rallenta con dataset grandi)      | Ottima (distribuisce il carico in modo efficiente)    |
-Scalabilità                 | Scarsa (rallenta con dataset grandi)      | Ottima (distribuisce il carico in modo efficiente)    |
